@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.post('/login',
+@router.post('/access-token',
             description=MSG['auth_token_access'], 
             response_model=Token,
             response_description=MSG['success_auth'], 
@@ -28,6 +28,5 @@ def login(request: OAuth2PasswordRequestForm = Depends()):
         raise credentials_exception
     if not PasswordToken.verify_password(request.password, user.password):
         raise credentials_exception
-
     access_token = PasswordToken.create_access_token(data={"id": user.id})
     return {"access_token": access_token, "token_type": "Bearer"}

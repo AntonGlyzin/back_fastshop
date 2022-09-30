@@ -8,7 +8,7 @@ from database import SessionLocal
 from settings import (TOKEN_ALGORITHM, SECRET_KEY)
 from messages import MSG
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/login/access-token")
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/users/access-token")
 
 
 def get_current_user(token: str = Depends(reusable_oauth2)):
@@ -25,3 +25,8 @@ def get_current_user(token: str = Depends(reusable_oauth2)):
     if not user:
         raise credentials_exception
     return user
+
+def get_active_user(current_user: Customer = Depends(get_current_user)):
+    if current_user.is_banned:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=MSG['not_user'])
+    return current_user

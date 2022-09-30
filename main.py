@@ -1,10 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from routers import products, basket, users
 from messages import MSG
 from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 from settings import ORIGINS
 from fastapi.staticfiles import StaticFiles
+import requests
 
 app = FastAPI()
 

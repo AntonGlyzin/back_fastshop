@@ -39,7 +39,8 @@ MESSAGES_RUS = {
     'api_401_desk': 'Неудачная авторизация',
     'auth_token_access': 'Авторизация для получеия токена доступа',
     'access_token': 'Токен доступа',
-    'type_token': 'Тип токена'
+    'type_token': 'Тип токена',
+    'sum': 'Сумма'
 }
                      
 class Messages:

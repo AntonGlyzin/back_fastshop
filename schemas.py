@@ -13,6 +13,13 @@ class GetListProd(BaseModel):
         orm_mode = True
 
 
+class GetListBasket(GetListProd):
+    quantity: Annotated[int | None, Field(description=MSG['quantity'])]
+    amount: Annotated[int | None, Field(description=MSG['sum'])]
+    class Config:
+        orm_mode = True
+
+
 class GetDetailProd(GetListProd):
     description: Annotated[str | None, Field(description=MSG['desk'])]
     quantity: Annotated[int | None, Field(description=MSG['quantity'])]

@@ -11,7 +11,7 @@ class PasswordToken:
 
     @staticmethod
     def create_access_token(data: dict) -> str:
-        expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode = {"exp": expire, "id": str(data['id'])}
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=TOKEN_ALGORITHM)
         return encoded_jwt
