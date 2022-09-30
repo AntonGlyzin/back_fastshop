@@ -10,6 +10,7 @@ Base = declarative_base()
 class Customer(Base):
     __tablename__ = 'customer'
     id = Column(Integer, primary_key=True)
+    username = Column(String(200), nullable=False, unique=True, index=True)
     email = Column(String(200), nullable=False, unique=True, index=True)
     password = Column(String, nullable=False)
     first_name = Column(String(100))
@@ -18,6 +19,7 @@ class Customer(Base):
     photo = Column(String(250))
     created = Column(DateTime, default=datetime.now)
     is_banned = Column(Boolean, default=False)
+    is_superuser = Column(Boolean, default=False)
 
 class Product(Base):
     __tablename__ = 'product'

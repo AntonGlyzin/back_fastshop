@@ -1,13 +1,24 @@
-from fastapi import Depends, FastAPI, HTTPException
-from routers import products
+from fastapi import FastAPI
+from routers import products, basket, users
 from messages import MSG
 from fastapi.openapi.utils import get_openapi
+from fastapi.middleware.cors import CORSMiddleware
+from settings import ORIGINS
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 def custom_openapi():
-    if app.openapi_schema:
-        return app.openapi_schema
     openapi_schema = get_openapi(
         title=MSG['shop_name'],
         description=MSG['shop_desk'],
@@ -18,10 +29,12 @@ def custom_openapi():
         },
     )
     openapi_schema["info"]["x-logo"] = {
-        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
+        "url": "static/shop.jpg"
     }
     app.openapi_schema = openapi_schema
     return app.openapi_schema
 
 app.openapi = custom_openapi
 app.include_router(products.router)
+app.include_router(basket.router)
+app.include_router(users.router)
