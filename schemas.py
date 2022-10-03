@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr, HttpUrl
 from typing_extensions import Annotated
 from messages import MSG
 
@@ -38,3 +38,6 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     id: int
+
+class GetProfile(BaseModel):
+    ...

@@ -46,3 +46,5 @@ def detail_product(id: int = Path(description=MSG['id'], example=1)):
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                               detail=MSG['products_not_found'])
         return products
+
+
