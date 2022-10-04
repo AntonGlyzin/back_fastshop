@@ -39,5 +39,24 @@ class Token(BaseModel):
 class TokenPayload(BaseModel):
     id: int
 
+
 class GetProfile(BaseModel):
-    ...
+    id: Annotated[int | None, Field(description=MSG['id'])]
+    username: Annotated[str | None, Field(description=MSG['username'])]
+    email: Annotated[EmailStr | None, Field(description=MSG['email'])]
+    first_name: Annotated[str | None, Field(description=MSG['first_name'])]
+    last_name: Annotated[str | None, Field(description=MSG['last_name'])]
+    photo: Annotated[str | None, Field(description=MSG['photo'])]
+
+
+class GetPhotoProfile(BaseModel):
+    url_photo: Annotated[str, Field(description=MSG['photo'])]
+
+
+class RegistrationCustomer(BaseModel):
+    username: Annotated[str, Field(description=MSG['username'])]
+    email: Annotated[EmailStr, Field(description=MSG['email'])]
+    first_name: Annotated[str, Field(description=MSG['first_name'])]
+    last_name: Annotated[str, Field(description=MSG['last_name'])]
+    password1: Annotated[str, Field(description=MSG['password'])]
+    password2: Annotated[str, Field(description=MSG['password'])]

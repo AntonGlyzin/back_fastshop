@@ -5,10 +5,10 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
 from settings import ORIGINS
 from fastapi.staticfiles import StaticFiles
-import requests
+from fastapi.middleware.gzip import GZipMiddleware
 
 app = FastAPI()
-
+app.add_middleware(GZipMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ORIGINS,

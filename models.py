@@ -18,7 +18,7 @@ class Customer(Base):
     full_name = column_property(first_name + " " + last_name)
     photo = Column(String(250))
     created = Column(DateTime, default=datetime.now)
-    is_banned = Column(Boolean, default=False)
+    is_banned = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=False)
 
 class Product(Base):
