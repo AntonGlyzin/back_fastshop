@@ -9,3 +9,4 @@ python-multipart
 python-dotenv
 pydantic[email]
 firebase_admin
+fastapi-mail

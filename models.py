@@ -8,6 +8,10 @@ from settings import CURRENCY
 Base = declarative_base()
 
 class Customer(Base):
+    '''
+    type_key: ['registration', 
+            'reset_password']
+    '''
     __tablename__ = 'customer'
     id = Column(Integer, primary_key=True)
     username = Column(String(200), nullable=False, unique=True, index=True)
@@ -18,7 +22,10 @@ class Customer(Base):
     full_name = column_property(first_name + " " + last_name)
     photo = Column(String(250))
     created = Column(DateTime, default=datetime.now)
-    is_banned = Column(Boolean, default=True)
+    key = Column(String(250))
+    type_key = Column(String(100))
+    is_banned = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=False)
     is_superuser = Column(Boolean, default=False)
 
 class Product(Base):

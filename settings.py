@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 dotenv_path = join(dirname(__file__), '.env')
 import firebase_admin
 from firebase_admin import credentials
+from fastapi_mail import ConnectionConfig
+
 load_dotenv(dotenv_path)
 BASE_DIR = dirname(__file__)
 
@@ -21,3 +23,11 @@ TOKEN_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60*24 # 24 hours
 CURRENCY = 'руб.'
 LANGUAGE_CODE = 'ru'
+
+CONFIG_EMAIL ={
+    'MAIL_PASSWORD': os.environ.get('MAIL_PASSWORD'),
+    'MAIL_FROM': os.environ.get('MAIL_FROM'),
+    'MAIL_PORT': 465,
+    'MAIL_SERVER': 'smtp.yandex.ru',
+    'CALLBACK_SITE': 'http://127.0.0.1:8000'
+}

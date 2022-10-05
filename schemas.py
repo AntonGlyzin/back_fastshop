@@ -30,6 +30,9 @@ class GetDetailProd(GetListProd):
 class Message(BaseModel):
     detail: Annotated[str | None, Field(description=MSG['desk_error'])]
 
+class SuccessMessage(BaseModel):
+    detail: Annotated[str | None, Field(description=MSG['success_message'])]
+
 
 class Token(BaseModel):
     access_token: Annotated[str | None, Field(description=MSG['access_token'])]
@@ -38,6 +41,7 @@ class Token(BaseModel):
 
 class TokenPayload(BaseModel):
     id: int
+    exp: int
 
 
 class GetProfile(BaseModel):

@@ -6,12 +6,14 @@ from database import SessionLocal
 from models import Customer
 from security import PasswordToken
 from schemas import (Token, Message, GetProfile, 
-                    GetPhotoProfile, RegistrationCustomer)
+                    GetPhotoProfile, SuccessMessage)
 from deps import get_active_user
 from settings import BASE_DIR
-from utils import FireBaseStorage
-from pydantic import EmailStr
+from utils import FireBaseStorage, EmailWorked
+from pydantic import EmailStr, SecretStr
 import os
+import uuid
+
 
 router = APIRouter(
     prefix="/users",
@@ -19,12 +21,51 @@ router = APIRouter(
     
 )
 
+@router.get('/confirm-registration', 
+            status_code=status.HTTP_200_OK, 
+            include_in_schema=False)
+def confirm_registration(key: str):
+    with SessionLocal() as session:
+        user = session.query(Customer).filter_by(key=key, type_key='registration').first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=MSG['not_user'])
+        session.query(Customer).filter_by(id=user.id).update({
+            Customer.key: None,
+            Customer.is_active: True,
+            Customer.type_key: None
+        })
+        session.commit()
+    return {
+        'detail': MSG['success_confirm_registration']
+    }
+
+
+@router.get('/reset-password', 
+            status_code=status.HTTP_200_OK, 
+            include_in_schema=False)
+def reset_password(key: str):
+    with SessionLocal() as session:
+        user = session.query(Customer).filter_by(key=key, type_key='reset_password').first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=MSG['not_user'])
+        key = uuid.uuid4().hex[0:5]
+        session.query(Customer).filter_by(id=user.id).update({
+            Customer.key: None,
+            Customer.password: PasswordToken.get_password_hash(key),
+            Customer.type_key: None
+        })
+        session.commit()
+        EmailWorked.send_password(user.email, key)    
+    return {
+        'detail': MSG['success_reset_pass']
+    }
+
+
 @router.post('/registration',
-            # description=MSG['auth_token_access'], 
-            # response_model=RegistrationCustomer,
             response_description=MSG['success_regist'], 
             summary=MSG['registration'],
             status_code=status.HTTP_201_CREATED,
+            response_model=SuccessMessage,
             responses={status.HTTP_400_BAD_REQUEST: {'model': Message, 'description': MSG['error_reg']}},)
 def registration(username: str = Form(description=MSG['username']),
                 email: EmailStr = Form(description=MSG['email']),
@@ -32,6 +73,7 @@ def registration(username: str = Form(description=MSG['username']),
                 last_name: str = Form(description=MSG['last_name']),
                 password1: str = Form(description=MSG['password']),
                 password2: str = Form(description=MSG['password'])):
+    key = uuid.uuid4().hex
     if password1 != password2:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=MSG['not_eq_pass'])
     with SessionLocal() as session:
@@ -46,12 +88,18 @@ def registration(username: str = Form(description=MSG['username']),
             email=email,
             first_name=first_name,
             last_name=last_name,
-            password=PasswordToken.get_password_hash(password1)
+            password=PasswordToken.get_password_hash(password1),
+            key=key,
+            type_key='registration'
         )
         session.add(customer)
         session.commit()
+    EmailWorked.send_confirm_registration(email, key)    
+    return {
+        'detail': MSG['send_message_email']
+    }
 
-
+    
 @router.post('/token',
             description=MSG['auth_token_access'], 
             response_model=Token,
@@ -63,13 +111,59 @@ def login(request: OAuth2PasswordRequestForm = Depends()):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail=MSG['incorrect_email_pass'])
     with SessionLocal() as session:
-        user: Customer = session.query(Customer).filter_by(username=request.username).first()
+        user: Customer = session.query(Customer).filter_by(username=request.username, is_banned=False, is_active=True).first()
     if not user:
         raise credentials_exception
     if not PasswordToken.verify_password(request.password, user.password):
         raise credentials_exception
     access_token = PasswordToken.create_access_token(data={"id": user.id})
     return {"access_token": access_token, "token_type": "Bearer"}
+
+
+@router.put('/confirm-reset-password',
+            response_description=MSG['success_message'], 
+            summary=MSG['reset_password'],
+            status_code=status.HTTP_200_OK,
+            response_model=SuccessMessage)
+def confirm_reset_password(email: EmailStr = Form(description=MSG['email'])):
+    with SessionLocal() as session:
+        user = session.query(Customer).filter_by(email=email, is_banned=False, is_active=True).first()
+        if user:
+            key = uuid.uuid4().hex
+            session.query(Customer).filter_by(email=email, id=user.id).update({
+                Customer.key: key,
+                Customer.type_key: 'reset_password'
+            })
+            session.commit()
+            EmailWorked.send_reset_password(email, key)
+    return {
+        'detail': MSG['return_confirm_reset_pass']
+    }
+
+
+@router.put('/change-password',
+            response_description=MSG['success_message'], 
+            summary=MSG['change_password'],
+            status_code=status.HTTP_200_OK,
+            response_model=SuccessMessage)
+def change_password(user: Customer = Depends(get_active_user),
+                    old_password: str = Form(description=MSG['old_password']),
+                    new_password1: str = Form(description=MSG['new_password']),
+                    new_password2: str = Form(description=MSG['new_password'])):
+    if new_password2 != new_password2:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=MSG['not_eq_pass'])
+    with SessionLocal() as session:
+        if not PasswordToken.verify_password(old_password, user.password):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=MSG['error_old_password'])
+        session.query(Customer).filter_by(id=user.id).update({
+            Customer.password: PasswordToken.get_password_hash(new_password1)
+        })
+        session.commit()
+            
+        EmailWorked.confirm_change_password(user.email)
+    return {
+        'detail': MSG['return_change_pass']
+    }
 
 
 @router.get('/me',

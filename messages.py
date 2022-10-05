@@ -68,7 +68,24 @@ MESSAGES_RUS = {
     'not_eq_pass': 'Пароли не совподают.',
     'reapit_email': 'На этот email уже зарегистрированн аккаунт.',
     'reapit_username': 'Такой username уже существует.',
-    'error_reg': 'Ошибка при регистрации'
+    'error_reg': 'Ошибка при регистрации',
+    'confirm_registration': 'Подтверждение регистрации',
+    'success_confirm_registration': 'Ваша учетная запись была подтвержденна.',
+    'send_message_email': 'На ваш E-mail было отправленно сообщение для подтверждения учетной записи.',
+    'untime_token': 'Время токена истекло.',
+    'reset_password': 'Сбросить пароль',
+    'success_message': 'Сообщение об успехе',
+    'return_confirm_reset_pass': 'Если вы зарегистрированны с этого адреса, то мы отправим вам ссылку для сброса пароля.',
+    'success_reset_pass': 'Пароль был успешно сброшен.',
+    'send_pass_mail': 'Ваш пароль был направлен на E-mail.',
+    'confirm_reset_pass': 'Подтверждение о сбросе пароля',
+    'old_password': 'Старый пароль',
+    'new_password': 'Новый пароль',
+    'error_old_password': 'Старый пароль был введен не верно.',
+    'notify_change_pass': 'Уведомление о смене пароля.',
+    'return_change_pass': 'Старый пароль успешно сменен на новый.',
+    'change_password': 'Сменить пароль',
+
 }
                      
 class Messages:
