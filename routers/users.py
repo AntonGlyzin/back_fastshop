@@ -145,7 +145,8 @@ def confirm_reset_password(email: EmailStr = Form(description=MSG['email'])):
             response_description=MSG['success_message'], 
             summary=MSG['change_password'],
             status_code=status.HTTP_200_OK,
-            response_model=SuccessMessage)
+            response_model=SuccessMessage,
+            responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}})
 def change_password(user: Customer = Depends(get_active_user),
                     old_password: str = Form(description=MSG['old_password']),
                     new_password1: str = Form(description=MSG['new_password']),
@@ -209,5 +210,18 @@ def set_photo_profile(user: Customer = Depends(get_active_user),
         }
     
 
-
+@router.put('/change-name-user',
+            response_description=MSG['success_message'], 
+            summary=MSG['change_name_user'],
+            status_code=status.HTTP_200_OK,
+            responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}},)
+def change_name_user(user: Customer = Depends(get_active_user),
+                    first_name: str = Form(description=MSG['first_name']),
+                    last_name: str = Form(description=MSG['last_name'])):
+    with SessionLocal() as session:
+        session.query(Customer).filter_by(id=user.id).update({
+            Customer.first_name: first_name,
+            Customer.first_name: last_name,
+        })
+        session.commit()
         

@@ -85,6 +85,7 @@ MESSAGES_RUS = {
     'notify_change_pass': 'Уведомление о смене пароля.',
     'return_change_pass': 'Старый пароль успешно сменен на новый.',
     'change_password': 'Сменить пароль',
+    'change_name_user': 'Сменить имя и фамилию',
 
 }
                      
