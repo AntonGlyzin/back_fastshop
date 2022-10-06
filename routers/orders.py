@@ -30,12 +30,3 @@ def all_active_orders(page: int = Query(description=MSG['page'], example=1),
                     status: bool = Query(description=MSG['status_orders'])):
     ...
 
-# @router.get('/my-orders', 
-#             response_model=List[GetItemOrder],
-#             response_description=MSG['archive_orders'], 
-#             summary=MSG['archive_orders'],
-#             status_code=status.HTTP_200_OK, )
-# def all_active_orders(page: int = Query(description=MSG['page'], example=1), 
-#                     limit: int = Query(example=30,description=MSG['limit_all_prod']),
-#                     user: Customer = Depends(get_active_user)):
-#     ...
