@@ -10,3 +10,4 @@ python-dotenv
 pydantic[email]
 firebase_admin
 fastapi-mail
+psycopg2-binary

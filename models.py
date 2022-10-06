@@ -1,5 +1,5 @@
 from sqlalchemy import Integer, String, \
-    Column, DateTime, ForeignKey, SmallInteger, Text, Float, Boolean
+    Column, DateTime, ForeignKey, SmallInteger, Text, Numeric, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, column_property
 from datetime import datetime
@@ -34,7 +34,7 @@ class Product(Base):
     title = Column(String(200), nullable=False)
     photo = Column(String(250))
     description = Column(Text)
-    price =  Column(Float(precision=10, decimal_return_scale=2), nullable=False)
+    price =  Column(Numeric(10,2), nullable=False)
     currency = Column(String(10), default=CURRENCY)
     quantity = Column(SmallInteger)
     created = Column(DateTime, default=datetime.now)
@@ -46,8 +46,8 @@ class Order(Base):
     __tablename__ = 'order'
     id = Column(Integer(), primary_key=True)
     customer_id = Column(Integer, ForeignKey('customer.id'), index=True)
-    amount =  Column(Float(precision=10, decimal_return_scale=2), nullable=False)
-    payd =  Column(Float(precision=10, decimal_return_scale=2), default=0)
+    amount =  Column(Numeric(10,2), nullable=False)
+    payd =  Column(Numeric(10,2), default=0)
     currency = Column(String(10), default=CURRENCY)
     date = Column(DateTime, default=datetime.now)
     status = Column(Boolean, default=False)
@@ -62,7 +62,7 @@ class ProductOrder(Base):
     order_id = Column(Integer, ForeignKey('order.id'))
     quantity = Column(SmallInteger, nullable=False)
     currency = Column(String(10), default=CURRENCY)
-    amount =  Column(Integer, nullable=False)
+    amount =  Column(Numeric(10,2), nullable=False)
     product = relationship('Product')
 
 class ItemsBasket(Base):

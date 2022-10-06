@@ -18,7 +18,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 ORIGINS = [
     'http://localhost'
 ]
-DATABASE_URL = 'sqlite:///fastshop.db'
+# DATABASE_URL = 'sqlite:///fastshop.db'
+DATABASE_URL = 'postgresql://postgres:postgres@localhost:5432/fastshop'
 TOKEN_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60*24 # 24 hours
 CURRENCY = 'руб.'

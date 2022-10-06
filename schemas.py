@@ -1,13 +1,13 @@
 from pydantic import BaseModel, Field, EmailStr, HttpUrl
 from typing_extensions import Annotated
 from messages import MSG
-
+from decimal import Decimal
 
 class GetListProd(BaseModel):
     id: Annotated[int | None, Field(description=MSG['id'])]
     title: Annotated[str | None, Field(description=MSG['title'])]
     photo: Annotated[str | None, Field(description=MSG['photo'])]
-    price: Annotated[float | None, Field(description=MSG['price'])]
+    price: Annotated[Decimal | None, Field(description=MSG['price'])]
     currency: Annotated[str | None, Field(description=MSG['currency'])]
     class Config:
         orm_mode = True
@@ -15,7 +15,7 @@ class GetListProd(BaseModel):
 
 class GetListBasket(GetListProd):
     quantity: Annotated[int | None, Field(description=MSG['quantity'])]
-    amount: Annotated[int | None, Field(description=MSG['sum'])]
+    amount: Annotated[Decimal | None, Field(description=MSG['sum'])]
     class Config:
         orm_mode = True
 

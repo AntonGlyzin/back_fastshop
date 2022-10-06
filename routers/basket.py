@@ -1,7 +1,6 @@
 from fastapi import (APIRouter, Depends, 
                     HTTPException, Path, 
                     Query, status)
-from sqlalchemy.orm import Session
 from models import Product, ItemsBasket, Customer
 from database import SessionLocal
 from messages import MSG
@@ -10,6 +9,8 @@ from typing import List
 from deps import (get_current_user, 
                     get_active_user, 
                     get_current_product)
+from decimal import Decimal
+
 
 router = APIRouter(
     prefix="/basket",
@@ -25,7 +26,7 @@ def get_item_product(prod):
     prod.price = prod.product.price
     prod.photo = prod.product.photo
     prod.currency = prod.product.currency
-    prod.amount = prod.quantity * prod.product.price
+    prod.amount = Decimal(prod.quantity) * prod.product.price
 
 @router.get('/all', 
             description=MSG['desk_all_prod'], 
@@ -97,7 +98,7 @@ def minus_product_basket(user: Customer = Depends(get_active_user),
             response_description=MSG['product_delete_basket'], 
             responses={status.HTTP_400_BAD_REQUEST: {'model': Message, 'description': MSG['not_product']}},
             summary=MSG['delete_product'],
-            status_code=status.HTTP_204_NO_CONTENT,
+            status_code=status.HTTP_200_OK,
             description=MSG['delete_product'])
 def delete_product_basket(user: Customer = Depends(get_active_user),
                        product: Product = Depends(get_current_product),):
@@ -108,4 +109,6 @@ def delete_product_basket(user: Customer = Depends(get_active_user),
         else:
             session.query(ItemsBasket).filter_by(customer=user, product=product).delete(synchronize_session=False)
             session.commit()
-            raise HTTPException(status_code=status.HTTP_204_NO_CONTENT, detail=MSG['product_delete_basket'])
+            return {
+                'detail': MSG['product_delete_basket']
+            }
