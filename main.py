@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request
-from routers import products, basket, users
+from routers import products, basket, users, orders
 from messages import MSG
 from fastapi.openapi.utils import get_openapi
 from fastapi.middleware.cors import CORSMiddleware
@@ -39,3 +39,4 @@ app.openapi = custom_openapi
 app.include_router(products.router)
 app.include_router(basket.router)
 app.include_router(users.router)
+app.include_router(orders.router)

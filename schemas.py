@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, EmailStr, HttpUrl
 from typing_extensions import Annotated
 from messages import MSG
 from decimal import Decimal
+from datetime import datetime
 
 class GetListProd(BaseModel):
     id: Annotated[int | None, Field(description=MSG['id'])]
@@ -64,3 +65,25 @@ class RegistrationCustomer(BaseModel):
     last_name: Annotated[str, Field(description=MSG['last_name'])]
     password1: Annotated[str, Field(description=MSG['password'])]
     password2: Annotated[str, Field(description=MSG['password'])]
+
+
+class GetItemOrder(BaseModel):
+    id: Annotated[int | None, Field(description=MSG['id'])]
+    title: Annotated[str | None, Field(description=MSG['title'])]
+    photo: Annotated[str | None, Field(description=MSG['photo'])]
+    quantity: Annotated[int | None, Field(description=MSG['quantity'])]
+    price: Annotated[Decimal | None, Field(description=MSG['price'])]
+    currency: Annotated[str | None, Field(description=MSG['currency'])]
+    amount: Annotated[Decimal | None, Field(description=MSG['sum'])]
+
+
+class GetOrders(BaseModel):
+    id: Annotated[int | None, Field(description=MSG['id'])]
+    products: Annotated[GetItemOrder | None, Field(description=MSG['products'])]
+    customer: Annotated[GetProfile | None, Field(description=MSG['profile'])]
+    amount: Annotated[Decimal | None, Field(description=MSG['sum'])]
+    payd: Annotated[Decimal | None, Field(description=MSG['payd'])]
+    currency: Annotated[str, Field(description=MSG['currency'])]
+    date: Annotated[datetime, Field(description=MSG['date'])]
+    status: Annotated[bool, Field(description=MSG['status_orders'])]
+    

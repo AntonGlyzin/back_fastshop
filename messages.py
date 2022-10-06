@@ -5,6 +5,12 @@ SHOP_DESK = """
 
 """
 
+DESK_ORDERS = """
+Есть два состояние у заказа:
+- `status = 0` - заказ либо в пути, либо на пункте выдаче.
+- `status = 1` - когда заказ получен покупателем.
+"""
+
 MESSAGES_RUS = {
     'products': 'Товары',
     'product': 'Товар',
@@ -86,7 +92,20 @@ MESSAGES_RUS = {
     'return_change_pass': 'Старый пароль успешно сменен на новый.',
     'change_password': 'Сменить пароль',
     'change_name_user': 'Сменить имя и фамилию',
-
+    'status_payd': 'Статус платежа',
+    'payd': 'Оплаченно',
+    'date': 'Дата',
+    'orders': 'Заказы',
+    'all_orders': 'Все заказы',
+    'payd_orders': 'Оплаченные заказы',
+    'active_orders': 'Активные заказы',
+    'my_orders': 'Мои заказы',
+    'archive_orders': 'Прошлые заказы',
+    'desk_orders': DESK_ORDERS,
+    '': '',
+    '': '',
+    '': '',
+    '': '',
 }
                      
 class Messages:
