@@ -50,7 +50,7 @@ class Order(Base):
     payd =  Column(Numeric(10,2), default=0)
     currency = Column(String(10), default=CURRENCY)
     date = Column(DateTime, default=datetime.now)
-    status = Column(Boolean, default=False)
+    status = Column(Integer, default=0)
     created = Column(DateTime, default=datetime.now)
     customer = relationship('Customer', backref='orders')
     products = relationship('ProductOrder', backref='order')

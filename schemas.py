@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, EmailStr, HttpUrl
+from pydantic import BaseModel, Field, EmailStr, HttpUrl, StrictBool
 from typing_extensions import Annotated
+from typing import List
 from messages import MSG
 from decimal import Decimal
 from datetime import datetime
@@ -79,11 +80,11 @@ class GetItemOrder(BaseModel):
 
 class GetOrders(BaseModel):
     id: Annotated[int | None, Field(description=MSG['id'])]
-    products: Annotated[GetItemOrder | None, Field(description=MSG['products'])]
+    products: Annotated[List[GetItemOrder] | None, Field(description=MSG['products'])]
     customer: Annotated[GetProfile | None, Field(description=MSG['profile'])]
     amount: Annotated[Decimal | None, Field(description=MSG['sum'])]
     payd: Annotated[Decimal | None, Field(description=MSG['payd'])]
-    currency: Annotated[str, Field(description=MSG['currency'])]
-    date: Annotated[datetime, Field(description=MSG['date'])]
-    status: Annotated[bool, Field(description=MSG['status_orders'])]
+    currency: Annotated[str | None, Field(description=MSG['currency'])]
+    created: Annotated[datetime | None, Field(description=MSG['date'])]
+    # status: Annotated[int | None, Field(description=MSG['status_orders'])]
     
