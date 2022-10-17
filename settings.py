@@ -24,11 +24,12 @@ TOKEN_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60*24 # 24 hours
 CURRENCY = 'руб.'
 LANGUAGE_CODE = 'ru'
+CALLBACK_MAIL = os.environ.get('MAIL_ADMIN') # предупреждение для продавца о заказе
 
 CONFIG_EMAIL ={
     'MAIL_PASSWORD': os.environ.get('MAIL_PASSWORD'),
     'MAIL_FROM': os.environ.get('MAIL_FROM'),
     'MAIL_PORT': 465,
     'MAIL_SERVER': 'smtp.yandex.ru',
-    'CALLBACK_SITE': 'http://127.0.0.1:8000'
+    'CALLBACK_SITE': 'http://127.0.0.1:8000',
 }

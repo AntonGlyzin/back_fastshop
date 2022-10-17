@@ -86,5 +86,4 @@ class GetOrders(BaseModel):
     payd: Annotated[Decimal | None, Field(description=MSG['payd'])]
     currency: Annotated[str | None, Field(description=MSG['currency'])]
     created: Annotated[datetime | None, Field(description=MSG['date'])]
-    # status: Annotated[int | None, Field(description=MSG['status_orders'])]
     

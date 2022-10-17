@@ -8,6 +8,7 @@ from schemas import (Message, GetItemOrder, GetOrders)
 from typing import List
 from deps import (get_active_user, get_current_product)
 from decimal import Decimal
+from utils import EmailWorked
 
 router = APIRouter(
     prefix="/orders",
@@ -103,8 +104,23 @@ def create_order(user: Customer = Depends(get_active_user)):
             )
             all_sum += item.product.price*item.quantity
             order.products.append(p)
+            
         order.amount = all_sum
         session.add_all([order, ])
         session.query(ItemsBasket).filter_by(customer_id=user.id).delete()
         session.commit()
+
+        try:
+            EmailWorked.send_notify_order_tome(order.id)
+            txt_products = ''
+            for product in order.products:
+                sum_prod = f'{product.amount} {product.currency}'
+                txt_products += f'{product.product.title}\t{product.quantity}\t{product.product.price}\t{sum_prod}\n'
+            EmailWorked.send_notify_order_tocustomer(user.email, 
+                                                    order.id, 
+                                                    f'{all_sum} {order.currency}',
+                                                    txt_products)
+        except Exception as err:
+            print(err)
+            
         return create_orders([order]).pop()

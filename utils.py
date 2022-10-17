@@ -1,5 +1,5 @@
 from firebase_admin import storage
-from settings import CONFIG_EMAIL, BASE_DIR
+from settings import CONFIG_EMAIL, BASE_DIR, CALLBACK_MAIL
 import smtplib
 import os
 from messages import MSG
@@ -68,3 +68,22 @@ class EmailWorked:
             txt = file.read()
         txt = txt % (CONFIG_EMAIL['CALLBACK_SITE'],)
         cls.send_email(to_mail, MSG['notify_change_pass'], txt)
+
+    @classmethod
+    def send_notify_order_tome(cls, order_id):
+        txt = ''
+        path = os.path.join(BASE_DIR, 'templates/email/notify-order-tome.txt')
+        with open(path, 'r', encoding='utf-8') as file:
+            txt = file.read()
+        txt = txt % (order_id,)
+        cls.send_email(CALLBACK_MAIL, MSG['new_order'], txt)
+
+    @classmethod
+    def send_notify_order_tocustomer(cls, to_email, order_id, order_sum, order_products):
+        txt = ''
+        path = os.path.join(BASE_DIR, 'templates/email/notify-order-tocustomer.txt')
+        with open(path, 'r', encoding='utf-8') as file:
+            txt = file.read()
+        txt = txt % (order_id, order_sum, order_products, )
+        cls.send_email(to_email, MSG['new_order'], txt)
+
