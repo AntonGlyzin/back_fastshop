@@ -11,3 +11,6 @@ pydantic[email]
 firebase_admin
 fastapi-mail
 psycopg2-binary
+django
+dj_database_url
+whitenoise
