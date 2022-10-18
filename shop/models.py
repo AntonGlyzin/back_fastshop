@@ -1,7 +1,6 @@
 from email.policy import default
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime
 from settings import CURRENCY
 
 class Customer(models.Model):
@@ -18,12 +17,14 @@ class Customer(models.Model):
     is_banned = models.BooleanField(verbose_name=_('Бан'), default=False)
     is_active = models.BooleanField(default=False, verbose_name=_('Активность'))
 
+    def __str__(self):
+        return f'{self.email}'
+
     class Meta:
         managed = False
         db_table = 'customer'
         verbose_name = _('покупателя')
         verbose_name_plural = _('Покупатели')
-        
 
 
 class ItemsBasket(models.Model):

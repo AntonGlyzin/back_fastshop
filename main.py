@@ -25,7 +25,7 @@ app.add_middleware(
 )
 
 # app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/", WSGIMiddleware(application))
+app.mount("/admin", WSGIMiddleware(application))
 app.mount("/static",
     StaticFiles(
          directory=os.path.normpath(
