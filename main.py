@@ -1,6 +1,6 @@
 import os
 from importlib.util import find_spec
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from routers import products, basket, users, orders
 from messages import MSG
 from fastapi.openapi.utils import get_openapi
@@ -12,7 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from django.core.wsgi import get_wsgi_application
 from fastapi.middleware.wsgi import WSGIMiddleware
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "admin.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 application = get_wsgi_application()
 app = FastAPI()
 app.add_middleware(GZipMiddleware)

@@ -26,7 +26,7 @@ class Customer(Base):
     type_key = Column(String(100))
     is_banned = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
-    is_superuser = Column(Boolean, default=False)
+    # is_superuser = Column(Boolean, default=False)
 
 class Product(Base):
     __tablename__ = 'product'
@@ -49,7 +49,7 @@ class Order(Base):
     amount =  Column(Numeric(10,2), nullable=False)
     payd =  Column(Numeric(10,2), default=0)
     currency = Column(String(10), default=CURRENCY)
-    date = Column(DateTime, default=datetime.now)
+    # date = Column(DateTime, default=datetime.now)
     status = Column(Integer, default=0)
     created = Column(DateTime, default=datetime.now)
     customer = relationship('Customer', backref='orders')
