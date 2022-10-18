@@ -33,6 +33,9 @@ class ItemsBasket(models.Model):
     quantity = models.SmallIntegerField(verbose_name=_('Количество'))
     created = models.DateTimeField(verbose_name=_('Дата добавления'), auto_now_add=True)
 
+    def __str__(self):
+        return f'{self.product.title}'
+
     class Meta:
         managed = False
         db_table = 'items_basket'
@@ -66,6 +69,9 @@ class Product(models.Model):
     updated = models.DateTimeField(auto_now=True, verbose_name=_('Дата обнавления'))
     is_active = models.BooleanField(default=True, verbose_name=_('Активность'))
 
+    def __str__(self):
+        return f'{self.title}'
+
     class Meta:
         managed = False
         db_table = 'product'
@@ -79,6 +85,9 @@ class ProductOrder(models.Model):
     quantity = models.SmallIntegerField(verbose_name=_('Количество'), default=1)
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Сумма'))
+
+    def __str__(self):
+        return f'{self.product.title}'
 
     class Meta:
         managed = False

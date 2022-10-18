@@ -16,6 +16,11 @@ class ProductAdmin(admin.ModelAdmin):
 class ItemsBasketAdmin(admin.ModelAdmin):
     pass
 
+class ItemsBasketInline(admin.TabularInline):
+    model = ItemsBasket
+    can_delete = False
+    readonly_fields = ['product', 'quantity', 'created']
+
 class ProductInline(admin.TabularInline):
     model = Product
 
@@ -25,20 +30,34 @@ class ProductOrderInline(admin.TabularInline):
 
 class OrderInline(admin.TabularInline):
     model = Order
+    can_delete = False
     inlines = [ProductOrderInline, ]
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
     icon_no = '<img src="/static/admin/img/icon-no.svg" alt="False">'
     icon_yes = '<img src="/static/admin/img/icon-yes.svg" alt="True">'
+    list_per_page = 20
     list_display = ['username', 'email', 'full_name','get_active', 'get_ban']
     list_display_links = ['username', 'email',]
-    search_fields = ['username', 'email',]
+    search_fields = ['username__icontains', 'email__icontains', ]
     list_filter = ['is_active', 'is_banned']
-    inlines = [OrderInline, ]
+    inlines = [ItemsBasketInline, OrderInline, ]
+    save_on_top = True
     exclude = ['password']
+    search_help_text = 'username / email'
     readonly_fields = ['username', 'email', 'first_name', 
                     'last_name', 'photo', 'key', 'type_key']
+
+    fieldsets = (
+        (None, {
+            'fields': ('username', 'email', 'first_name', 'last_name', 'photo', 'key', 'type_key')
+        }),
+        (_('Активность / Бан'), {
+            'classes': ('collapse',),
+            'fields': ('is_active', 'is_banned'),
+        }),
+    )
 
     @admin.display(ordering='is_active')
     def get_active(self, object):
