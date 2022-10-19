@@ -1,7 +1,8 @@
-from email.policy import default
+from re import I
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from settings import CURRENCY
+from utils import EmailWorked
 
 class Customer(models.Model):
     CHOOSE_TYPE_KEY = [('registration', 'registration'), ('reset_password', 'reset_password') ]
@@ -44,12 +45,25 @@ class ItemsBasket(models.Model):
 
 
 class Order(models.Model):
+    CHOOSE_PAYED = [(0, _('В ожидание')), (1, _('Оплачено'))]
     customer = models.ForeignKey(Customer, models.PROTECT, verbose_name=_('Покупатель'))
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Сумма'))
     payd = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name=_('Оплачено'))
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
-    status = models.IntegerField(default=0, verbose_name=_('Статус'))
+    status = models.IntegerField(default=0, verbose_name=_('Статус'), choices=CHOOSE_PAYED)
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата'))
+
+    def save(self, **kwargs):
+        if self.status and self.payd != self.amount:
+            self.payd = self.amount
+            try:
+                EmailWorked.send_notify_payd_tocustomer(self.customer.email)
+            except Exception as err:
+                print(err)
+        return super().save(**kwargs)
+
+    def __str__(self):
+        return _('Заказ №')+f'{self.id}'
 
     class Meta:
         managed = False
@@ -60,7 +74,7 @@ class Order(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=200, verbose_name=_('Название'))
-    photo = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Ссылка на фото'))
+    photo = models.ImageField(max_length=255, blank=True, null=True, verbose_name=_('Фото'), upload_to='fastshop/product')
     description = models.TextField(blank=True, null=True, verbose_name=_('Описание'))
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Цена'))
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
@@ -68,6 +82,10 @@ class Product(models.Model):
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата добавления'))
     updated = models.DateTimeField(auto_now=True, verbose_name=_('Дата обнавления'))
     is_active = models.BooleanField(default=True, verbose_name=_('Активность'))
+
+    @property
+    def amount_products(self):
+        return self.price*self.quantity
 
     def __str__(self):
         return f'{self.title}'
@@ -78,11 +96,14 @@ class Product(models.Model):
         verbose_name = _('товар')
         verbose_name_plural = _('Товары')
 
+    def save(self, **kwargs):
+        return super().save(**kwargs)
+
 
 class ProductOrder(models.Model):
-    product = models.ForeignKey(Product, models.PROTECT, blank=True, null=True, verbose_name=_('Товар'))
-    order = models.ForeignKey(Order, models.PROTECT, blank=True, null=True, verbose_name=_('Заказ'))
-    quantity = models.SmallIntegerField(verbose_name=_('Количество'), default=1)
+    product = models.ForeignKey(Product, models.PROTECT, verbose_name=_('Товар'))
+    order = models.ForeignKey(Order, models.PROTECT, verbose_name=_('Заказ'), related_name='')
+    quantity = models.SmallIntegerField(verbose_name=_('Количество'), default=0)
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Сумма'))
 

@@ -3,3 +3,4 @@ env
 __pycache__
 alembic/versions/**
 google-service.json
+migrations

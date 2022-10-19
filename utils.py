@@ -3,7 +3,9 @@ from settings import CONFIG_EMAIL, BASE_DIR, CALLBACK_MAIL
 import smtplib
 import os
 from messages import MSG
-import uuid
+from django.core.files.storage import Storage
+from django.core.files import File
+from settings import FIREBASE_URL
 
 class FireBaseStorage:
     @staticmethod
@@ -13,6 +15,30 @@ class FireBaseStorage:
         blob.upload_from_string(source, content_type=type)
         blob.make_public()
         return blob.public_url
+
+
+class FireBase(Storage):
+
+    def __init__(self):
+        self.bucket = storage.bucket()
+
+    def _save(self, path, content):
+        blob = self.bucket.blob(path)
+        blob.upload_from_string(content.read(), content_type=content.content_type)
+        blob.make_public()
+        return path
+
+    # def _open(self, name, mode='rb'):
+    #     return File(open(self.path(name), mode))
+
+    def exists(self, path):
+        return self.bucket.blob(path).exists()
+
+    def path(self, path):
+        return path
+
+    def url(self, path):
+        return f'{FIREBASE_URL}/{path}'
 
 
 class EmailWorked:
@@ -86,4 +112,12 @@ class EmailWorked:
             txt = file.read()
         txt = txt % (order_id, order_sum, order_products, )
         cls.send_email(to_email, MSG['new_order'], txt)
+
+    @classmethod
+    def send_notify_payd_tocustomer(cls, to_email):
+        txt = ''
+        path = os.path.join(BASE_DIR, 'templates/email/notify-payd-customer.txt')
+        with open(path, 'r', encoding='utf-8') as file:
+            txt = file.read()
+        cls.send_email(to_email, MSG['confirm_payd'], txt)
 

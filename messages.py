@@ -106,7 +106,9 @@ MESSAGES_RUS = {
     'desk_order_create': 'Заказ возможно оформить, если корзина не пуста.',
     'order': 'Заказ',
     'api_desk_not_found_basket': 'В корзине пусто',
-    'new_order': 'Новый заказ'
+    'new_order': 'Новый заказ',
+    'error_create_order': 'Ошибка при оформление товара',
+    'confirm_payd': 'Подтверждение оплаты'
 }
                      
 class Messages:

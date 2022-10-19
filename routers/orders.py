@@ -83,7 +83,8 @@ def all_active_orders(page: int = Query(description=MSG['page'], example=1),
             status_code=status.HTTP_201_CREATED, 
             response_description=MSG['order'],
             responses={
-                status.HTTP_404_NOT_FOUND: {'model': Message, 'description': MSG['api_desk_not_found']}},)
+                status.HTTP_404_NOT_FOUND: {'model': Message, 'description': MSG['api_desk_not_found']},
+                status.HTTP_400_BAD_REQUEST: {'model': Message, 'description': MSG['error_create_order']}},)
 def create_order(user: Customer = Depends(get_active_user)):
     with SessionLocal() as session:
         items_basket = session.query(ItemsBasket).filter_by(customer=user).all()
@@ -96,6 +97,14 @@ def create_order(user: Customer = Depends(get_active_user)):
         )
         all_sum = 0
         for item in items_basket:
+            if item.quantity <= item.product.quantity:
+                session.query(Product).filter_by(id=item.product.id).update({
+                    Product.quantity: Product.quantity - item.quantity
+                })
+            else:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                              detail=MSG['error_create_order'])
+            
             p = ProductOrder(
                 product_id=item.product.id,
                 currency=item.product.currency,

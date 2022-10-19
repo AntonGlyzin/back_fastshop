@@ -4,9 +4,7 @@ from dotenv import load_dotenv
 dotenv_path = join(dirname(__file__), '.env')
 import firebase_admin
 from firebase_admin import credentials
-from fastapi_mail import ConnectionConfig
 
-from pathlib import Path
 import dj_database_url
 import os
 
@@ -83,7 +81,7 @@ TEMPLATES = [
 ]
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL') )
+    'default': dj_database_url.parse(url=os.environ.get('DATABASE_URL'))
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -110,3 +108,6 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEFAULT_FILE_STORAGE = 'utils.FireBase'
+FIREBASE_URL = 'https://storage.googleapis.com/' + os.environ.get('BUCKET_STORAGE_NAME') 
