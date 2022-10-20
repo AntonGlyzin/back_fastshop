@@ -108,7 +108,12 @@ MESSAGES_RUS = {
     'api_desk_not_found_basket': 'В корзине пусто',
     'new_order': 'Новый заказ',
     'error_create_order': 'Ошибка при оформление товара',
-    'confirm_payd': 'Подтверждение оплаты'
+    'confirm_payd': 'Подтверждение оплаты',
+    'add_point_paece': 'Добавить пункт доставки',
+    'change_point_peace': 'Изменить пункт доставки',
+    'point_peace': 'Пункт доставки',
+    'id_point_peace': 'ИД пункт доставки',
+    'delete_point_peace': 'Удалить пункт доставки',
 }
                      
 class Messages:

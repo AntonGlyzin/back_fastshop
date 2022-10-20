@@ -111,7 +111,7 @@ class EmailWorked:
         with open(path, 'r', encoding='utf-8') as file:
             txt = file.read()
         txt = txt % (order_id, order_sum, order_products, )
-        cls.send_email(to_email, MSG['new_order'], txt)
+        cls.send_email(to_email, MSG['new_order']+f' №{order_id}', txt)
 
     @classmethod
     def send_notify_payd_tocustomer(cls, to_email):

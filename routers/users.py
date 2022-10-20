@@ -195,19 +195,20 @@ def set_photo_profile(user: Customer = Depends(get_active_user),
     if not 'image' in photo.content_type:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=MSG['need_image'])
     
-    file_size: int = photo.file.seek(0, os.SEEK_END) / 1024 #Kb
-    if file_size > 1024*3: #если больше 3 Mb
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=MSG['error_size_photo'])
-
     with photo.file as file:
-        dist = f"fastshop/{user.username}/{photo.filename}"
-        url = FireBaseStorage.get_link_file(file.read(), dist, photo.content_type)
-    with SessionLocal() as session:
-        session.query(Customer).filter_by(id=user.id).update({Customer.photo: url})
-        session.commit()
-        return {
-            'url_photo': url
-        }
+        file_buffer = file.read()
+        file_size: int = len(file_buffer) / 1024#Kb
+        if file_size > 1024*3: #если больше 3 Mb
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=MSG['error_size_photo'])
+
+        dist = f"fastshop/users/{user.username}/{photo.filename}"
+        url = FireBaseStorage.get_link_file(file_buffer, dist, photo.content_type)
+        with SessionLocal() as session:
+            session.query(Customer).filter_by(id=user.id).update({Customer.photo: url})
+            session.commit()
+            return {
+                'url_photo': url
+            }
     
 
 @router.put('/change-name-user',
@@ -224,4 +225,37 @@ def change_name_user(user: Customer = Depends(get_active_user),
             Customer.first_name: last_name,
         })
         session.commit()
-        
+
+
+@router.post('/add-point-peace',
+            response_description=MSG['success_message'], 
+            summary=MSG['add_point_paece'],
+            status_code=status.HTTP_200_OK,
+            responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}},)
+def add_point_paece(user: Customer = Depends(get_active_user),
+                    desc_peace: str = Form(description=MSG['point_peace'])):
+    with SessionLocal() as session:
+        ...
+
+
+@router.put('/change-point-peace',
+            response_description=MSG['success_message'], 
+            summary=MSG['change_point_peace'],
+            status_code=status.HTTP_200_OK,
+            responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}},)
+def change_point_peace(user: Customer = Depends(get_active_user),
+                    id_peace: int = Form(description=MSG['id_point_peace']),
+                    new_desc_peace: str = Form(description=MSG['point_peace'])):
+    with SessionLocal() as session:
+        ...
+
+
+@router.delete('/delete-point-peace',
+            response_description=MSG['success_message'], 
+            summary=MSG['delete_point_peace'],
+            status_code=status.HTTP_200_OK,
+            responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}},)
+def change_point_peace(user: Customer = Depends(get_active_user),
+                    id_peace: int = Form(description=MSG['id_point_peace'])):
+    with SessionLocal() as session:
+        ...

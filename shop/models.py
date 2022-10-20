@@ -28,8 +28,23 @@ class Customer(models.Model):
         verbose_name_plural = _('Покупатели')
 
 
+class PeaceCustomer(models.Model):
+    customer = models.ForeignKey(Customer, models.CASCADE, verbose_name=_('Покупатель'), related_name='peaces_customer')
+    active = models.BooleanField(default=False, verbose_name=_('Активность'))
+    peace = models.TextField(blank=True, null=True, verbose_name=_('Место доставки'))
+
+    def __str__(self):
+        return _('Доставка для ')+f' {self.customer.email}'
+
+    class Meta:
+        managed = False
+        db_table = 'peace_customer'
+        verbose_name = _('место доставки')
+        verbose_name_plural = _('Места доставки')
+
+
 class ItemsBasket(models.Model):
-    customer = models.ForeignKey(Customer, models.CASCADE, verbose_name=_('Покупатель'))
+    customer = models.ForeignKey(Customer, models.CASCADE, verbose_name=_('Покупатель'), related_name='items_basket')
     product = models.ForeignKey('Product', models.CASCADE, verbose_name=_('Продукт'))
     quantity = models.SmallIntegerField(verbose_name=_('Количество'))
     created = models.DateTimeField(verbose_name=_('Дата добавления'), auto_now_add=True)
@@ -46,12 +61,17 @@ class ItemsBasket(models.Model):
 
 class Order(models.Model):
     CHOOSE_PAYED = [(0, _('В ожидание')), (1, _('Оплачено'))]
-    customer = models.ForeignKey(Customer, models.PROTECT, verbose_name=_('Покупатель'))
+    customer = models.ForeignKey(Customer, models.PROTECT, verbose_name=_('Покупатель'), related_name='orders')
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Сумма'))
     payd = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name=_('Оплачено'))
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
     status = models.IntegerField(default=0, verbose_name=_('Статус'), choices=CHOOSE_PAYED)
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата'))
+
+    # def delete(self, using=None, keep_parents=None):
+        # if not self.status:
+        # print(self.products_order.all())
+        # return False
 
     def save(self, **kwargs):
         if self.status and self.payd != self.amount:
@@ -101,8 +121,8 @@ class Product(models.Model):
 
 
 class ProductOrder(models.Model):
-    product = models.ForeignKey(Product, models.PROTECT, verbose_name=_('Товар'))
-    order = models.ForeignKey(Order, models.PROTECT, verbose_name=_('Заказ'), related_name='')
+    product = models.ForeignKey(Product, models.CASCADE, verbose_name=_('Товар'), related_name='products_order')
+    order = models.ForeignKey(Order, models.CASCADE, verbose_name=_('Заказ'), related_name='products_order')
     quantity = models.SmallIntegerField(verbose_name=_('Количество'), default=0)
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Сумма'))

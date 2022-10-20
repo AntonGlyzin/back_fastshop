@@ -26,7 +26,14 @@ class Customer(Base):
     type_key = Column(String(100))
     is_banned = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
-    # is_superuser = Column(Boolean, default=False)
+
+class PeaceCustomer(Base):
+    __tablename__ = 'peace_customer'
+    id = Column(Integer, primary_key=True)
+    customer_id = Column(Integer, ForeignKey('customer.id'), index=True)
+    active = Column(Boolean, default=False)
+    peace = Column(Text, nullable=False)
+    customer = relationship('Customer', backref='peaces')
 
 class Product(Base):
     __tablename__ = 'product'
@@ -41,7 +48,6 @@ class Product(Base):
     updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     is_active = Column(Boolean, default=True)
 
-
 class Order(Base):
     __tablename__ = 'order'
     id = Column(Integer(), primary_key=True)
@@ -49,7 +55,6 @@ class Order(Base):
     amount =  Column(Numeric(10,2), nullable=False)
     payd =  Column(Numeric(10,2), default=0)
     currency = Column(String(10), default=CURRENCY)
-    # date = Column(DateTime, default=datetime.now)
     status = Column(Integer, default=0)
     created = Column(DateTime, default=datetime.now)
     customer = relationship('Customer', backref='orders')

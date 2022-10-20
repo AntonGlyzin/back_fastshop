@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from shop.models import Product, ItemsBasket, Customer, Order, ProductOrder
+from shop.models import Product, ItemsBasket, Customer, Order, ProductOrder, PeaceCustomer
 from django.utils.safestring import mark_safe
 from django.db.models import Value, F
 from django.db.models.functions import Concat
@@ -13,6 +13,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'quantity', 'price', 'currency', 'get_sum_product']
     list_display_links = ['id', 'title',]
     search_fields = ['id', 'title__icontains', ]
+    search_help_text = 'ID / Название'
     fieldsets = (
         (None, {
             'fields': ('title', 'description', 'quantity', 'price', 'currency')
@@ -38,6 +39,7 @@ class ItemsBasketInline(admin.TabularInline):
     can_delete = False
     readonly_fields = ['product', 'quantity', 'created']
     list_per_page = 20
+    ordering = ['-created']
 
 
 class ProductOrderInline(admin.TabularInline):
@@ -47,12 +49,30 @@ class ProductOrderInline(admin.TabularInline):
 
 
 class OrderInline(admin.TabularInline):
+    icon_no = '<img src="/static/admin/img/icon-no.svg" alt="False">'
+    icon_yes = '<img src="/static/admin/img/icon-yes.svg" alt="True">'
     model = Order
     can_delete = False
-    inlines = [ProductOrderInline, ]
-    readonly_fields = ['payd', 'amount', 'currency', 'created']
+    readonly_fields = ['created', 'payd', 'amount', 'currency', 'get_status', ]
+    exclude = ['status']
     list_per_page = 20
+    ordering = ['-created']
+    show_change_link = True
 
+    @admin.display(description=_("Оплачено"))
+    def get_status(self, obj):
+        if obj.status:
+           return  mark_safe(self.icon_yes)
+        else:
+            return  mark_safe(self.icon_no)
+
+
+class PeaceCustomerInline(admin.TabularInline):
+    model = PeaceCustomer
+    can_delete = False
+    readonly_fields = ['active', 'peace', ]
+    radio_fields = ['active',]
+    list_per_page = 20
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
@@ -61,18 +81,18 @@ class CustomerAdmin(admin.ModelAdmin):
     list_per_page = 20
     list_display = ['username', 'email', 'full_name','get_active', 'get_ban']
     list_display_links = ['username', 'email',]
-    search_fields = ['username__icontains', 'email__icontains', ]
+    search_fields = ['username__iexact', 'email__icontains', ]
     list_filter = ['is_active', 'is_banned']
-    inlines = [ItemsBasketInline, OrderInline, ]
+    inlines = [PeaceCustomerInline, OrderInline, ItemsBasketInline]
     save_on_top = True
     exclude = ['password']
     search_help_text = 'username / email'
     readonly_fields = ['username', 'email', 'first_name', 
-                    'last_name', 'photo', 'key', 'type_key']
+                    'last_name', 'key', 'type_key', 'get_link_photo', 'get_html_photo']
 
     fieldsets = (
-        (None, {
-            'fields': ('username', 'email', 'first_name', 'last_name', 'photo', 'key', 'type_key')
+        (_('Общая информация'.upper()), {
+            'fields': ('username', 'email', 'first_name', 'last_name', 'get_link_photo', 'get_html_photo', 'key', 'type_key', )
         }),
         (_('Активность / Бан'), {
             'classes': ('collapse',),
@@ -80,14 +100,17 @@ class CustomerAdmin(admin.ModelAdmin):
         }),
     )
 
-    @admin.display(ordering='is_active')
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.display(ordering='is_active', description=_("Активен"))
     def get_active(self, object):
         if object.is_active:
            return  mark_safe(self.icon_yes)
         else:
             return  mark_safe(self.icon_no)
 
-    @admin.display(ordering='is_banned')
+    @admin.display(ordering='is_banned', description=_("Бан"))
     def get_ban(self, object):
         if object.is_banned:
            return  mark_safe(self.icon_yes)
@@ -98,8 +121,27 @@ class CustomerAdmin(admin.ModelAdmin):
     def full_name(self, object):
         return object.last_name + ' ' + object.first_name
 
-    get_active.short_description = _("Активен")
-    get_ban.short_description = _("Бан")
+    @admin.display(description=_("Фото"))
+    def get_html_photo(self, object):
+        if object.photo:
+            return mark_safe(f"<img src='{object.photo}' width=213>")
+
+    @admin.display(description=_("Ссылка на фото"))
+    def get_link_photo(self, object):
+        if object.photo:
+            txt = _('Открыть фото')
+            return mark_safe(f"<a href='{object.photo}' >{txt}</a>")
+
+    def has_add_permission(self, request):
+        return False
+
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['show_save_and_continue'] = False
+        extra_context['show_save'] = False
+        extra_context['show_delete'] = False
+        return super().changeform_view(request, object_id, form_url, extra_context)
+
     full_name.short_description = _("Полное имя")
 
 
@@ -116,16 +158,28 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ['status',]
     readonly_fields = ['customer', 'amount', 'currency', 'payd', 'created']
 
-    @admin.display(ordering='id')
+    @admin.display(ordering='id', description=_("Номер заказа"))
     def get_order_number(self, object):
         return _(f'Заказ №{object.id}')
 
-    @admin.display(ordering='status')
+    def has_add_permission(self, request):
+        return False
+
+    @admin.display(ordering='status', description=_("Оплачено"))
     def get_status(self, object):
         if object.status:
            return  mark_safe(self.icon_yes)
         else:
             return  mark_safe(self.icon_no)
 
-    get_status.short_description = _("Оплачено")
-    get_order_number.short_description = _("Номер заказа")
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        order = Order.objects.get(id=object_id)
+        if order.status:
+            self.readonly_fields = ['status', 'customer', 'amount', 'currency', 'payd', 'created']
+            extra_context['show_delete'] = False
+            extra_context['show_save_and_continue'] = False
+            extra_context['show_save'] = False
+        else:
+            self.readonly_fields = ['customer', 'amount', 'currency', 'payd', 'created']
+        return super().changeform_view(request, object_id, form_url, extra_context)

@@ -24,7 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/admin", WSGIMiddleware(application))
 app.mount("/static",
     StaticFiles(
@@ -34,6 +33,7 @@ app.mount("/static",
    ),
    name="static",
 )
+app.mount("/static", StaticFiles(directory='static'),name="static",)
 
 def custom_openapi():
     openapi_schema = get_openapi(
