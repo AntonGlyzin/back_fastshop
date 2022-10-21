@@ -3,7 +3,7 @@ from fastapi import (APIRouter, Depends, status,
 from fastapi.security import OAuth2PasswordRequestForm
 from messages import MSG
 from database import SessionLocal
-from models import Customer
+from models import Customer, PeaceCustomer
 from security import PasswordToken
 from schemas import (Token, Message, GetProfile, 
                     GetPhotoProfile, SuccessMessage)
@@ -230,32 +230,56 @@ def change_name_user(user: Customer = Depends(get_active_user),
 @router.post('/add-point-peace',
             response_description=MSG['success_message'], 
             summary=MSG['add_point_paece'],
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}},)
 def add_point_paece(user: Customer = Depends(get_active_user),
                     desc_peace: str = Form(description=MSG['point_peace'])):
     with SessionLocal() as session:
-        ...
+        pc = PeaceCustomer(customer_id=user.id, peace=desc_peace)
+        session.add(pc)
+        session.commit()
 
 
-@router.put('/change-point-peace',
+
+@router.put('/change-point-desk-peace',
             response_description=MSG['success_message'], 
-            summary=MSG['change_point_peace'],
-            status_code=status.HTTP_200_OK,
+            summary=MSG['change_point_desk_peace'],
+            status_code=status.HTTP_202_ACCEPTED,
             responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}},)
 def change_point_peace(user: Customer = Depends(get_active_user),
                     id_peace: int = Form(description=MSG['id_point_peace']),
                     new_desc_peace: str = Form(description=MSG['point_peace'])):
     with SessionLocal() as session:
-        ...
+        session.query(PeaceCustomer).filter_by(id=id_peace, customer=user).update({
+            PeaceCustomer.peace: new_desc_peace
+        })
+        session.commit()
 
 
 @router.delete('/delete-point-peace',
             response_description=MSG['success_message'], 
             summary=MSG['delete_point_peace'],
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_204_NO_CONTENT,
             responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}},)
 def change_point_peace(user: Customer = Depends(get_active_user),
                     id_peace: int = Form(description=MSG['id_point_peace'])):
     with SessionLocal() as session:
-        ...
+        session.query(PeaceCustomer).filter_by(id=id_peace, customer=user).delete()
+        session.commit()
+
+
+@router.put('/change-point-peace',
+            response_description=MSG['success_message'], 
+            summary=MSG['change_point_peace'],
+            status_code=status.HTTP_202_ACCEPTED,
+            responses={status.HTTP_401_UNAUTHORIZED: {'model': Message, 'description': MSG['no_auth']}},)
+def change_point_peace(user: Customer = Depends(get_active_user),
+                    id_peace: int = Form(description=MSG['id_point_peace'])):
+    with SessionLocal() as session:
+        session.query(PeaceCustomer).filter_by(customer=user).update({
+            PeaceCustomer.active: False
+        })
+        session.query(PeaceCustomer).filter_by(id=id_peace, customer=user).update({
+            PeaceCustomer.active: True
+        })
+        session.commit()

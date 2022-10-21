@@ -4,8 +4,10 @@ from shop.models import Product, ItemsBasket, Customer, Order, ProductOrder, Pea
 from django.utils.safestring import mark_safe
 from django.db.models import Value, F
 from django.db.models.functions import Concat
+from django.contrib import messages
 
 admin.site.site_header = _('Админка интернет-магазина')
+admin.site.disable_action('delete_selected')
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -14,6 +16,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display_links = ['id', 'title',]
     search_fields = ['id', 'title__icontains', ]
     search_help_text = 'ID / Название'
+    save_on_top = True
     fieldsets = (
         (None, {
             'fields': ('title', 'description', 'quantity', 'price', 'currency')
@@ -27,11 +30,10 @@ class ProductAdmin(admin.ModelAdmin):
     def get_sum_product(self, object):
         return f'{object.amount_products} {object.currency}'
 
+    @admin.display(description='')
     def get_html_photo(self, object):
         if object.photo.url:
-            return mark_safe(f"<img src='{object.photo.url}' width=213>")
-
-    get_html_photo.short_description = _("")
+            return mark_safe(f"<img src='{object.photo.url}' width=213>")\
 
 
 class ItemsBasketInline(admin.TabularInline):
