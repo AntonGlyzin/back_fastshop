@@ -11,7 +11,7 @@ admin.site.disable_action('delete_selected')
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    readonly_fields = ['get_html_photo']
+    readonly_fields = ['get_html_photo', 'created', ]
     list_display = ['id', 'title', 'quantity', 'price', 'currency', 'get_sum_product']
     list_display_links = ['id', 'title',]
     search_fields = ['id', 'title__icontains', ]
@@ -19,7 +19,7 @@ class ProductAdmin(admin.ModelAdmin):
     save_on_top = True
     fieldsets = (
         (None, {
-            'fields': ('title', 'description', 'quantity', 'price', 'currency')
+            'fields': ('title', 'description', 'quantity', 'price', 'currency', 'created', )
         }),
         (_('Изображение'), {
             'fields': ('photo', 'get_html_photo'),

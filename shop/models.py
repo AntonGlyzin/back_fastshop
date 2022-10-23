@@ -1,8 +1,10 @@
+from email.policy import default
 from re import I
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from settings import CURRENCY
+from settings import CURRENCY, TIME_ZONE
 from utils import EmailWorked
+from django.utils import timezone
 
 class Customer(models.Model):
     CHOOSE_TYPE_KEY = [('registration', 'registration'), ('reset_password', 'reset_password') ]
@@ -12,7 +14,7 @@ class Customer(models.Model):
     first_name = models.CharField(max_length=100, verbose_name=_('Имя'))
     last_name = models.CharField(max_length=100, verbose_name=_('Фамилия'))
     photo = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Ссылка на фото'))
-    created = models.DateTimeField(verbose_name=_('Дата регистрации'), auto_now_add=True)
+    created = models.DateTimeField(verbose_name=_('Дата регистрации'), default=timezone.now())
     key = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Ключ'))
     type_key = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('Тип ключа'), choices=CHOOSE_TYPE_KEY)
     is_banned = models.BooleanField(verbose_name=_('Бан'), default=False)
@@ -47,7 +49,7 @@ class ItemsBasket(models.Model):
     customer = models.ForeignKey(Customer, models.CASCADE, verbose_name=_('Покупатель'), related_name='items_basket')
     product = models.ForeignKey('Product', models.CASCADE, verbose_name=_('Продукт'))
     quantity = models.SmallIntegerField(verbose_name=_('Количество'))
-    created = models.DateTimeField(verbose_name=_('Дата добавления'), auto_now_add=True)
+    created = models.DateTimeField(verbose_name=_('Дата добавления'), default=timezone.now())
 
     def __str__(self):
         return f'{self.product.title}'
@@ -66,7 +68,7 @@ class Order(models.Model):
     payd = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name=_('Оплачено'))
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
     status = models.IntegerField(default=0, verbose_name=_('Статус'), choices=CHOOSE_PAYED)
-    created = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата'))
+    created = models.DateTimeField(default=timezone.now(), verbose_name=_('Дата'))
 
     def save(self, **kwargs):
         if self.status and self.payd != self.amount:
@@ -94,8 +96,8 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Цена'))
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
     quantity = models.SmallIntegerField(verbose_name=_('Количество'), default=1)
-    created = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата добавления'))
-    updated = models.DateTimeField(auto_now=True, verbose_name=_('Дата обнавления'))
+    created = models.DateTimeField(default=timezone.now(), verbose_name=_('Дата добавления'))
+    updated = models.DateTimeField(verbose_name=_('Дата обнавления'), default=timezone.now())
     is_active = models.BooleanField(default=True, verbose_name=_('Активность'))
 
     @property

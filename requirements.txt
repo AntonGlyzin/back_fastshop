@@ -15,3 +15,4 @@ django
 dj_database_url
 whitenoise
 pillow
+django-cors-headers

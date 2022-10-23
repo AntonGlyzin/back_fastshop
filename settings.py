@@ -24,7 +24,6 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 TOKEN_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60*24 # 24 hours
 CURRENCY = 'руб.'
-LANGUAGE_CODE = 'ru'
 CALLBACK_MAIL = os.environ.get('MAIL_ADMIN') # предупреждение для продавца о заказе
 
 CONFIG_EMAIL ={
@@ -38,7 +37,15 @@ CONFIG_EMAIL ={
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:8083',
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8083',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -47,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'shop.apps.ShopConfig'
 ]
 
@@ -54,6 +62,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
