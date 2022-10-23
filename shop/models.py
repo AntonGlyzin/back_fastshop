@@ -68,11 +68,6 @@ class Order(models.Model):
     status = models.IntegerField(default=0, verbose_name=_('Статус'), choices=CHOOSE_PAYED)
     created = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата'))
 
-    # def delete(self, using=None, keep_parents=None):
-        # if not self.status:
-        # print(self.products_order.all())
-        # return False
-
     def save(self, **kwargs):
         if self.status and self.payd != self.amount:
             self.payd = self.amount
@@ -115,9 +110,6 @@ class Product(models.Model):
         db_table = 'product'
         verbose_name = _('товар')
         verbose_name_plural = _('Товары')
-
-    def save(self, **kwargs):
-        return super().save(**kwargs)
 
 
 class ProductOrder(models.Model):

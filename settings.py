@@ -6,7 +6,6 @@ import firebase_admin
 from firebase_admin import credentials
 
 import dj_database_url
-import os
 
 load_dotenv(dotenv_path)
 BASE_DIR = dirname(__file__)
@@ -67,7 +66,7 @@ ROOT_URLCONF = 'urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
