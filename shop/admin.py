@@ -159,6 +159,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ['get_order_number', 'get_status']
     list_filter = ['status',]
     readonly_fields = ['customer', 'amount', 'currency', 'payd', 'created']
+    date_hierarchy = 'created'
 
     @admin.display(ordering='id', description=_("Номер заказа"))
     def get_order_number(self, object):
