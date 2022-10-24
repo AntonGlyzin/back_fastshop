@@ -1,4 +1,6 @@
-from fastapi import FastAPI, Request
+import os
+from importlib.util import find_spec
+from fastapi import FastAPI
 from routers import products, basket, users, orders
 from messages import MSG
 from fastapi.openapi.utils import get_openapi
@@ -6,7 +8,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from settings import ORIGINS
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.staticfiles import StaticFiles
+from django.core.wsgi import get_wsgi_application
+from fastapi.middleware.wsgi import WSGIMiddleware
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+application = get_wsgi_application()
 app = FastAPI()
 app.add_middleware(GZipMiddleware)
 app.add_middleware(
@@ -17,7 +24,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/admin", WSGIMiddleware(application))
+app.mount("/static",
+    StaticFiles(
+         directory=os.path.normpath(
+              os.path.join(find_spec("django.contrib.admin").origin, '..',"static/")
+         )
+   ),
+   name="static",
+)
+app.mount("/static", StaticFiles(directory='static'),name="static",)
 
 def custom_openapi():
     openapi_schema = get_openapi(

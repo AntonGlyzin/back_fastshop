@@ -61,6 +61,9 @@ def add_product_basket(user: Customer = Depends(get_active_user),
                        product: Product = Depends(get_current_product),):
     with SessionLocal() as session:
         item_product = session.query(ItemsBasket).filter_by(customer=user, product=product).first()
+        if product.quantity < 1:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                              detail=MSG['products_not_found'])
         if item_product is None:
             item_product = ItemsBasket(customer=user, product=product, quantity=1)
             session.add(item_product)

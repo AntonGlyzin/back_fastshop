@@ -8,7 +8,6 @@ from database import SessionLocal
 from settings import (TOKEN_ALGORITHM, SECRET_KEY)
 from messages import MSG
 from models import Product
-from datetime import datetime
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/users/token")
 
