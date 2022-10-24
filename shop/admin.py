@@ -73,7 +73,6 @@ class PeaceCustomerInline(admin.TabularInline):
     model = PeaceCustomer
     can_delete = False
     readonly_fields = ['active', 'peace', ]
-    radio_fields = ['active',]
     list_per_page = 20
 
 @admin.register(Customer)

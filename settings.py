@@ -31,7 +31,7 @@ CONFIG_EMAIL ={
     'MAIL_FROM': os.environ.get('MAIL_FROM'),
     'MAIL_PORT': 465,
     'MAIL_SERVER': 'smtp.yandex.ru',
-    'CALLBACK_SITE': 'http://127.0.0.1:8000',
+    'CALLBACK_SITE': 'http://127.0.0.1:8083',
 }
 
 

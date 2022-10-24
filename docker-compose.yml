@@ -14,6 +14,10 @@ services:
       - .env
     depends_on:
       - db
+    links:
+      - db:db
+    networks:
+      - netdjango
 
   nginx:
     build: ./nginx
@@ -23,6 +27,10 @@ services:
       - static:/app/static
     depends_on:
       - web
+    links:
+      - web:web
+    networks:
+      - netdjango
 
   db:
     image: postgres:11-alpine
@@ -32,6 +40,8 @@ services:
       - .env
     ports:
       - 5432:5432
+    networks:
+      - netdjango
 
   adminer:
     image: adminer
@@ -40,6 +50,8 @@ services:
       - 8081:8080
     depends_on:
       - db
+    networks:
+      - netdjango
 
   pgadmin:
     image: dpage/pgadmin4
@@ -50,7 +62,13 @@ services:
       - 8082:80
     depends_on:
       - db
+    networks:
+      - netdjango
 
 volumes:
   pgdata:
   static:
+
+networks:
+  netdjango:
+    driver: bridge

@@ -10,7 +10,7 @@ class Customer(models.Model):
     CHOOSE_TYPE_KEY = [('registration', 'registration'), ('reset_password', 'reset_password') ]
     username = models.CharField(unique=True, max_length=200, verbose_name=_('Username'))
     email = models.CharField(unique=True, max_length=200, verbose_name=_('E-mail'))
-    password = models.CharField(max_length=-1, verbose_name=_('Пароль'))
+    password = models.CharField(verbose_name=_('Пароль'), max_length=250)
     first_name = models.CharField(max_length=100, verbose_name=_('Имя'))
     last_name = models.CharField(max_length=100, verbose_name=_('Фамилия'))
     photo = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('Ссылка на фото'))
