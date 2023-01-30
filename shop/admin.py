@@ -5,13 +5,15 @@ from django.utils.safestring import mark_safe
 from django.db.models import Value, F
 from django.db.models.functions import Concat
 from django.contrib import messages
+from django.db.models import Avg, Max, Min, Sum, Count
+
 
 admin.site.site_header = _('Админка интернет-магазина')
 admin.site.disable_action('delete_selected')
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    readonly_fields = ['get_html_photo', 'created', ]
+    readonly_fields = ['get_html_photo', 'created', 'updated']
     list_display = ['id', 'title', 'quantity', 'price', 'currency', 'get_sum_product']
     list_display_links = ['id', 'title',]
     search_fields = ['id', 'title__icontains', ]
@@ -19,7 +21,7 @@ class ProductAdmin(admin.ModelAdmin):
     save_on_top = True
     fieldsets = (
         (None, {
-            'fields': ('title', 'description', 'quantity', 'price', 'currency', 'created', )
+            'fields': ('title', 'description', 'quantity', 'price', 'currency', 'created', 'updated')
         }),
         (_('Изображение'), {
             'fields': ('photo', 'get_html_photo'),
@@ -33,7 +35,28 @@ class ProductAdmin(admin.ModelAdmin):
     @admin.display(description='')
     def get_html_photo(self, object):
         if object.photo.url:
-            return mark_safe(f"<img src='{object.photo.url}' width=213>")\
+            return mark_safe(f"<img src='{object.photo.url}' width=213>")
+
+    def get_queryset(self, request):
+        return super().get_queryset(request)        
+    
+    def changelist_view(self, request, extra_context=None):
+        response = super().changelist_view(request, extra_context)
+        change_list = response.context_data['cl']
+        queryset = change_list.queryset
+        extra_context = {
+            #{'total_item__sum': Decimal('785.20'), 'quantity__sum': 16}
+            'total_product': self.get_total(queryset)
+        }
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def get_total(self, queryset):
+        prod = (Product.objects
+                        .filter(is_active=True, id__in=[item.id for item in queryset])
+                        .values('currency')
+                        .annotate(total_sum=Sum(F('quantity')*F('price')), total_count=Sum("quantity"))
+        )
+        return prod
 
 
 class ItemsBasketInline(admin.TabularInline):
@@ -42,12 +65,14 @@ class ItemsBasketInline(admin.TabularInline):
     readonly_fields = ['product', 'quantity', 'created']
     list_per_page = 20
     ordering = ['-created']
+    extra = 0
 
 
 class ProductOrderInline(admin.TabularInline):
     model = ProductOrder
     can_delete = False
     readonly_fields = ['product', 'quantity', 'amount', 'currency']
+    extra = 0
 
 
 class OrderInline(admin.TabularInline):
@@ -60,6 +85,7 @@ class OrderInline(admin.TabularInline):
     list_per_page = 20
     ordering = ['-created']
     show_change_link = True
+    extra = 0
 
     @admin.display(description=_("Оплачено"))
     def get_status(self, obj):
@@ -74,6 +100,7 @@ class PeaceCustomerInline(admin.TabularInline):
     can_delete = False
     readonly_fields = ['active', 'peace', ]
     list_per_page = 20
+    extra = 0
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):

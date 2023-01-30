@@ -15,6 +15,11 @@ class GetListProd(BaseModel):
         orm_mode = True
 
 
+class GetPageProd(BaseModel):
+    pages: Annotated[Decimal | None, Field(description=MSG['count_pages'])]
+    products: Annotated[List[GetListProd], Field(description=MSG['products'])]
+
+
 class GetListBasket(GetListProd):
     quantity: Annotated[int | None, Field(description=MSG['quantity'])]
     amount: Annotated[Decimal | None, Field(description=MSG['sum'])]

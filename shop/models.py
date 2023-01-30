@@ -97,7 +97,7 @@ class Product(models.Model):
     currency = models.CharField(max_length=10, default=CURRENCY, verbose_name=_('Валюта'))
     quantity = models.SmallIntegerField(verbose_name=_('Количество'), default=1)
     created = models.DateTimeField(default=timezone.now(), verbose_name=_('Дата добавления'))
-    updated = models.DateTimeField(verbose_name=_('Дата обнавления'), default=timezone.now())
+    updated = models.DateTimeField(verbose_name=_('Дата обнавления'), auto_now=timezone.now())
     is_active = models.BooleanField(default=True, verbose_name=_('Активность'))
 
     @property

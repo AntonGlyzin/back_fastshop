@@ -115,6 +115,7 @@ MESSAGES_RUS = {
     'id_point_peace': 'ИД пункт доставки',
     'delete_point_peace': 'Удалить пункт доставки',
     'change_point_desk_peace': 'Корректировать пункт доставки',
+    'count_pages': 'Количество страниц',
 }
                      
 class Messages:
