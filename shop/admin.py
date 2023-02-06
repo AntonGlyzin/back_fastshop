@@ -44,11 +44,8 @@ class ProductAdmin(admin.ModelAdmin):
         response = super().changelist_view(request, extra_context)
         change_list = response.context_data['cl']
         queryset = change_list.queryset
-        extra_context = {
-            #{'total_item__sum': Decimal('785.20'), 'quantity__sum': 16}
-            'total_product': self.get_total(queryset)
-        }
-        return super().changelist_view(request, extra_context=extra_context)
+        response.context_data['total_product'] = self.get_total(queryset)
+        return response
 
     def get_total(self, queryset):
         prod = (Product.objects

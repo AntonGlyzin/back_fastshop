@@ -38,6 +38,8 @@ services:
       - 8081:8080
     depends_on:
       - db
+    links:
+      - db:db
 
   pgadmin:
     image: dpage/pgadmin4
@@ -48,6 +50,8 @@ services:
       - 8082:80
     depends_on:
       - db
+    links:
+      - db:db
 
 volumes:
   pgdata:
