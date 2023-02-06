@@ -159,7 +159,7 @@ class Tags(models.Model):
     class Meta:
         managed = False
         db_table = 'tags'
-        verbose_name = _('Тег')
+        verbose_name = _('тег')
         verbose_name_plural = _('Теги')
 
 class MapProductTags(models.Model):
@@ -169,3 +169,5 @@ class MapProductTags(models.Model):
     class Meta:
         managed = False
         db_table = 'product_tags'
+        verbose_name = _('тег')
+        verbose_name_plural = _('Теги')

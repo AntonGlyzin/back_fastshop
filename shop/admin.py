@@ -13,6 +13,18 @@ from django.db.models import Avg, Max, Min, Sum, Count
 admin.site.site_header = _('Админка интернет-магазина')
 admin.site.disable_action('delete_selected')
 
+class TagsInline(admin.TabularInline):
+    model = MapProductTags
+    list_per_page = 20
+    extra = 0
+    raw_id_fields = ("tags__name", )
+
+
+@admin.register(Tags)
+class TagsAdmin(admin.ModelAdmin):
+    list_display = ['name', ]
+    prepopulated_fields = {"slug": ("name",)}
+
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -21,6 +33,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'quantity', 'price', 'currency', 'get_sum_product',  ]
     list_display_links = ['id', 'title',]
     search_fields = ['id', 'title__icontains', ]
+    inlines = [TagsInline]
     search_help_text = 'ID / Название'
     save_on_top = True
     fieldsets = (
