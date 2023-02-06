@@ -91,6 +91,9 @@ class Order(models.Model):
 
 class Product(models.Model):
     title = models.CharField(max_length=200, verbose_name=_('Название'))
+    slug = models.CharField(max_length=200, verbose_name=_('Slug'))
+    tags = models.ManyToManyField('Tags', through='MapProductTags')
+    category = models.ForeignKey('Category', models.CASCADE, verbose_name=_('Категория'), )
     photo = models.ImageField(max_length=255, blank=True, null=True, verbose_name=_('Фото'), upload_to='fastshop/product')
     description = models.TextField(blank=True, null=True, verbose_name=_('Описание'))
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name=_('Цена'))
@@ -129,3 +132,40 @@ class ProductOrder(models.Model):
         db_table = 'product_order'
         verbose_name = _('заказанный товар')
         verbose_name_plural = _('Заказанные товары')
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=200, verbose_name=_('Название'))
+    slug = models.CharField(max_length=200, verbose_name=_('Slug'))
+    photo = models.ImageField(max_length=255, blank=True, null=True, verbose_name=_('Фото'), upload_to='fastshop/category')
+
+    def __str__(self):
+        return f'{self.name}'
+    
+    class Meta:
+        managed = False
+        db_table = 'category'
+        verbose_name = _('категорию')
+        verbose_name_plural = _('Категории')
+
+    
+class Tags(models.Model):
+    name = models.CharField(max_length=200, verbose_name=_('Название'))
+    slug = models.CharField(max_length=200, verbose_name=_('Slug'))
+
+    def __str__(self):
+        return f'{self.name}'
+    
+    class Meta:
+        managed = False
+        db_table = 'tags'
+        verbose_name = _('Тег')
+        verbose_name_plural = _('Теги')
+
+class MapProductTags(models.Model):
+    product = models.ForeignKey(Product, models.CASCADE)
+    tags = models.ForeignKey(Tags, models.CASCADE)
+
+    class Meta:
+        managed = False
+        db_table = 'product_tags'

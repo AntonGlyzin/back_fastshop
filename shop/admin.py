@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
-from shop.models import Product, ItemsBasket, Customer, Order, ProductOrder, PeaceCustomer
+from shop.models import (Product, ItemsBasket, Customer, 
+                         Order, ProductOrder, PeaceCustomer,
+                         Category, Tags, MapProductTags)
 from django.utils.safestring import mark_safe
 from django.db.models import Value, F
 from django.db.models.functions import Concat
@@ -11,17 +13,20 @@ from django.db.models import Avg, Max, Min, Sum, Count
 admin.site.site_header = _('Админка интернет-магазина')
 admin.site.disable_action('delete_selected')
 
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    readonly_fields = ['get_html_photo', 'created', 'updated']
-    list_display = ['id', 'title', 'quantity', 'price', 'currency', 'get_sum_product']
+    readonly_fields = ['get_html_photo', 'created', 'updated', ]
+    prepopulated_fields = {"slug": ("title",)}
+    list_display = ['id', 'title', 'quantity', 'price', 'currency', 'get_sum_product',  ]
     list_display_links = ['id', 'title',]
     search_fields = ['id', 'title__icontains', ]
     search_help_text = 'ID / Название'
     save_on_top = True
     fieldsets = (
         (None, {
-            'fields': ('title', 'description', 'quantity', 'price', 'currency', 'created', 'updated')
+            'fields': ('title', 'slug','category','description', 'quantity', 
+                       'price', 'currency', 'created', 'updated')
         }),
         (_('Изображение'), {
             'fields': ('photo', 'get_html_photo'),
@@ -209,3 +214,8 @@ class OrderAdmin(admin.ModelAdmin):
         else:
             self.readonly_fields = ['customer', 'amount', 'currency', 'payd', 'created']
         return super().changeform_view(request, object_id, form_url, extra_context)
+    
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'photo']
+    prepopulated_fields = {"slug": ("name",)}

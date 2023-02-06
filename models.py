@@ -39,6 +39,7 @@ class Product(Base):
     __tablename__ = 'product'
     id = Column(Integer, primary_key=True)
     title = Column(String(200), nullable=False)
+    slug = Column(String(200))
     photo = Column(String(250))
     description = Column(Text)
     price =  Column(Numeric(10,2), nullable=False)
@@ -47,6 +48,30 @@ class Product(Base):
     created = Column(DateTime, default=datetime.now)
     updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     is_active = Column(Boolean, default=True)
+
+    category_id = Column(Integer, ForeignKey('category.id'), index=True)
+    category = relationship('Category', backref='products')
+    tags = relationship('Tags', secondary='product_tags', back_populates='products')
+
+class Category(Base):
+    __tablename__ = 'category'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(200), nullable=False)
+    slug = Column(String(200), nullable=False)
+    photo = Column(String(250))
+
+class Tags(Base):
+    __tablename__ = 'tags'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(200), nullable=False)
+    slug = Column(String(200), nullable=False)
+    products = relationship('Product', secondary='product_tags', back_populates='tags')
+
+class MapProductTags(Base):
+    __tablename__ = 'product_tags'
+    id = Column(Integer, primary_key=True)
+    product_id = Column(Integer, ForeignKey('product.id'))
+    tags_id = Column(Integer, ForeignKey('tags.id'))
 
 class Order(Base):
     __tablename__ = 'order'
